@@ -37,13 +37,14 @@ app = Flask(__name__)
 #################################################
 # Flask Routes
 #################################################
+
 #1. Main Page
 @app.route("/")
 def main():
     """List all available api routes."""
     return (
         'Welcome to our API<br/>'
-        f"Available Routes:<br/>"  #CHANGE TO REFLE
+        f"Available Routes:<br/>"  
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
@@ -51,6 +52,7 @@ def main():
         f'/api/v1.0/<start>/<end><br/>'
     )
 
+#2.Precipitation Page
 @app.route("/api/v1.0/precipitation")
 def prcp():
     last_12_months = session.query(measurement.date, measurement.prcp)\
@@ -64,6 +66,28 @@ def prcp():
         output.append(pass_dict)        
     return jsonify(output)
 
+#3. Stations Page
+@app.route("/api/v1.0/stations")
+def stations():
+    stations = session.query(measurement.station,func.count(measurement.station)).group_by(measurement.station)\
+            .order_by(func.count(measurement.station).desc()).all()
+    output = []
+    for record in stations:
+        output.append(record.station)
+    return jsonify(output)
+
+#4. Tobs page
+@app.route("/api/v1.0/tobs")
+def stations():
+    last_12 = session.query(measurement.date,measurement.tobs).filter(measurement.station=='USC00519281').\
+            filter((measurement.date < '2017-08-23')&(measurement.date >=(dt.date(2017,8,23)-dt.timedelta(days=365)))).all()
+    output = []
+    for date,tobs in last_12:
+        pass_dict = {}
+        pass_dict['date']  = date
+        pass_dict['prcp'] = tobs
+        output.append(pass_dict)        
+    return jsonify(output)
 
 if __name__ == '__main__':
     app.run(debug=True)

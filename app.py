@@ -78,14 +78,14 @@ def stations():
 
 #4. Tobs page
 @app.route("/api/v1.0/tobs")
-def stations():
+def tobs():
     last_12 = session.query(measurement.date,measurement.tobs).filter(measurement.station=='USC00519281').\
             filter((measurement.date < '2017-08-23')&(measurement.date >=(dt.date(2017,8,23)-dt.timedelta(days=365)))).all()
     output = []
     for date,tobs in last_12:
         pass_dict = {}
         pass_dict['date']  = date
-        pass_dict['prcp'] = tobs
+        pass_dict['tobs'] = tobs
         output.append(pass_dict)        
     return jsonify(output)
 

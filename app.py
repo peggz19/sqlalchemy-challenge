@@ -78,7 +78,7 @@ def stations():
         pass_dict['station'] = stations[counter][0]
         pass_dict['total'] = stations[counter][1]
         output.append(pass_dict)
-        counter =+ 1
+        counter = counter + 1
     return jsonify(output)
 
 #4. Tobs page

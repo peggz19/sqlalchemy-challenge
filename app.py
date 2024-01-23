@@ -48,7 +48,7 @@ def main():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f'/api/v1.0/date/<start><br/>'
+        f'/api/v1.0/date/yyyy-mm-dd<start><br/>'
         f'/api/v1.0/<start>/<end><br/>'
     )
 
@@ -92,6 +92,7 @@ def tobs():
 #5. Start and End Date
 @app.route("/api/v1.0/date/<start>")
 def date(start):
+    #First we put our query into a list 
     dict_ = []
     temps = session.query(measurement.date,measurement.tobs).all()
     for date,tobs in temps:
@@ -100,12 +101,12 @@ def date(start):
         pass_dict['tobs'] = tobs
         dict_.append(pass_dict)
 
+    #Se
     for i in dict_:
        if i['date']==start:
             output = session.query(func.min(measurement.tobs),func.max(measurement.tobs),func.avg(measurement.tobs))\
-                .filter(measurement.date>i).all()
-            values = print(output)
-            return (f'The minimum value, the maximum value and the average are respectively {values}')
+                .filter(measurement.date>i['date']).all()
+            return (f'The minimum value, the maximum value and the average are respectively {output}')
         #return jsonify(dict_) This works when line 105 to 108 are removed and line 109 (this one) ran
 if __name__ == '__main__':
     app.run(debug=True)

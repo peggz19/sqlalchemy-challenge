@@ -48,17 +48,17 @@ def main():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f'/api/v1.0/<start><br/>'
+        f'/api/v1.0/date/<start><br/>'
         f'/api/v1.0/<start>/<end><br/>'
     )
 
 #2.Precipitation Page
 @app.route("/api/v1.0/precipitation")
-def prcp():
+def prcp(): #first we query what we are looking for
     last_12_months = session.query(measurement.date, measurement.prcp)\
                 .filter((measurement.date < '2017-08-23')&(measurement.date >=(dt.date(2017,8,23)-dt.timedelta(days=365)))).\
                 order_by(measurement.date).all()
-    output = []
+    output = [] #then we pass it onto a dictionary
     for date,prcp in last_12_months:
         pass_dict = {}
         pass_dict['date']  = date
@@ -89,5 +89,23 @@ def tobs():
         output.append(pass_dict)        
     return jsonify(output)
 
+#5. Start and End Date
+@app.route("/api/v1.0/date/<start>")
+def date(start):
+    dict_ = []
+    temps = session.query(measurement.date,measurement.tobs).all()
+    for date,tobs in temps:
+        pass_dict = {}
+        pass_dict['date'] = date
+        pass_dict['tobs'] = tobs
+        dict_.append(pass_dict)
+
+    for i in dict_:
+       if i['date']==start:
+            output = session.query(func.min(measurement.tobs),func.max(measurement.tobs),func.avg(measurement.tobs))\
+                .filter(measurement.date>i).all()
+            values = print(output)
+            return (f'The minimum value, the maximum value and the average are respectively {values}')
+        #return jsonify(dict_) This works when line 105 to 108 are removed and line 109 (this one) ran
 if __name__ == '__main__':
     app.run(debug=True)

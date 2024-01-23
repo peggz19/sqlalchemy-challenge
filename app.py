@@ -49,7 +49,7 @@ def main():
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
         f'/api/v1.0/date/yyyy-mm-dd<start><br/>'
-        f'/api/v1.0/<start>/<end><br/>'
+        f'/api/v1.0/date/yyyy-mm-dd/yyyy-mm-dd<start>/<end><br/>'
     )
 
 #2.Precipitation Page
@@ -89,7 +89,7 @@ def tobs():
         output.append(pass_dict)        
     return jsonify(output)
 
-#5. Start and End Date
+#5.1 Start and End Date
 @app.route("/api/v1.0/date/<start>")
 def date(start):
     #First we put our query into a list 
@@ -101,12 +101,24 @@ def date(start):
         pass_dict['tobs'] = tobs
         dict_.append(pass_dict)
 
-    #Se
+    #Second, we create a query that's going to give back min, max and avg values based on the above dict.
+    #And we load the result into a list
+    lsit = []
     for i in dict_:
        if i['date']==start:
             output = session.query(func.min(measurement.tobs),func.max(measurement.tobs),func.avg(measurement.tobs))\
                 .filter(measurement.date>i['date']).all()
-            return (f'The minimum value, the maximum value and the average are respectively {output}')
-        #return jsonify(dict_) This works when line 105 to 108 are removed and line 109 (this one) ran
+            pass_dict = {}
+            pass_dict['MIN'] = output[0][0]
+            pass_dict['MAX'] = output[0][1]
+            pass_dict['AVG'] = output[0][2]
+            lsit.append(pass_dict)
+            return jsonify(lsit)
+            
+
+#5.2 Start and End Given Dates
+#@app.route("/api/v1.0/date/<start>/<end>")
+
+                
 if __name__ == '__main__':
     app.run(debug=True)

@@ -54,7 +54,7 @@ def main():
 
 #2.Precipitation Page
 @app.route("/api/v1.0/precipitation")
-def prcp(): #first we query what we are looking for
+def prcp(): #first we query what we are looking for which are each dates and theyr respective prcp level
     last_12_months = session.query(measurement.date, measurement.prcp)\
                 .filter((measurement.date < '2017-08-23')&(measurement.date >=(dt.date(2017,8,23)-dt.timedelta(days=365)))).\
                 order_by(measurement.date).all()
@@ -68,12 +68,17 @@ def prcp(): #first we query what we are looking for
 
 #3. Stations Page
 @app.route("/api/v1.0/stations")
-def stations():
+def stations(): 
     stations = session.query(measurement.station,func.count(measurement.station)).group_by(measurement.station)\
             .order_by(func.count(measurement.station).desc()).all()
     output = []
-    for record in stations:
-        output.append(record.station)
+    counter = 0
+    for i in stations:
+        pass_dict = {}
+        pass_dict['station'] = stations[counter][0]
+        pass_dict['total'] = stations[counter][1]
+        output.append(pass_dict)
+        counter =+ 1
     return jsonify(output)
 
 #4. Tobs page
@@ -117,7 +122,6 @@ def date(start):
             
 
 #5.2 Start and End Given Dates
-#@app.route("/api/v1.0/date/<start>/<end>")
 
                 
 if __name__ == '__main__':

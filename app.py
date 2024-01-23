@@ -136,16 +136,19 @@ def datess(start,end):
     #Second, we create a query that's going to give back min, max and avg values based on the above dict.
     #And we load the result into a list
     lsit = []
-    for i,c in dict_:
-       if i['date']==start & c['date']==end:
-            output = session.query(func.min(measurement.tobs),func.max(measurement.tobs),func.avg(measurement.tobs))\
-                .filter(measurement.date>i['date']).filter(measurement.date<c['date']).all()
-            pass_dict = {}
-            pass_dict['MIN'] = output[0][0]
-            pass_dict['MAX'] = output[0][1]
-            pass_dict['AVG'] = output[0][2]
-            lsit.append(pass_dict)
-            return jsonify(lsit)
+    for i in dict_:
+       if i['date']==start:
+            for c in dict_:
+                if c['date'] ==end :
+                    output = session.query(func.min(measurement.tobs),func.max(measurement.tobs),func.avg(measurement.tobs))\
+                    .filter(measurement.date>=i['date']).filter(measurement.date<=c['date']).all()
+                    pass_dict = {}
+                    pass_dict['MIN'] = output[0][0]
+                    pass_dict['MAX'] = output[0][1]
+                    pass_dict['AVG'] = output[0][2]
+                    lsit.append(pass_dict)
+                    return jsonify(lsit)
+
 
                 
 if __name__ == '__main__':
